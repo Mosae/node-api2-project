@@ -25,17 +25,41 @@ router.get('/:id', (req, res) => {
 });
 
 //add post to list
+// router.post('/', (req, res) => {
+// 	Blog.insert(req.body)
+// 		.then((blog) => {
+// 			res.status(201).json(blog);
+// 		})
+// 		.catch((error) => {
+// 			console.log(error);
+// 			res.status(400).json({
+// 				errorMessage: 'Please provide title and contents for the post.',
+// 			});
+// 		});
+// });
+
 router.post('/', (req, res) => {
-	Blog.insert(req.body)
-		.then((blog) => {
-			res.status(201).json(blog);
-		})
-		.catch((error) => {
-			console.log(error);
-			res.status(400).json({
-				errorMessage: 'Please provide title and contents for the post.',
-			});
+	//check to see if request had valid body title and content
+	if (!req.body.title || !req.body.contents) {
+		res.status(400).json({
+			errorMessage: 'Please provide title and contents for the post.',
 		});
+		//if valid we use .insert
+	} else {
+		Blog.insert(req.body).then((blog) => {
+			res.status(201).json({ message: 'Created' });
+		});
+	}
+});
+//find comment
+router.get('/', (req, res) => {
+	Blog.findPostComments(postId).then((comment) => {
+		if (post) {
+			res.status(200).json(comment);
+		} else {
+			res.status(404).json({ message: 'Comment cannot be found' });
+		}
+	});
 });
 
 //edit post using id
