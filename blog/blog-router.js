@@ -56,4 +56,22 @@ router.put('/:id', (req, res) => {
 		});
 });
 
+//delete post using id
+router.delete('/:id', (req, res) => {
+	Blog.remove(req.params.id)
+		.then((count) => {
+			if (count > 0) {
+				res.status(200).json({ message: 'The post was deleted ' });
+			} else {
+				res
+					.status(404)
+					.json({ message: 'The post with the specified ID does not exist.' });
+			}
+		})
+		.catch((error) => {
+			console.log(error);
+			res.status(500).json({ message: 'Error removing the post' });
+		});
+});
+
 module.exports = router;
