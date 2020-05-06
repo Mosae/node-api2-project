@@ -9,11 +9,15 @@ const router = express.Router();
 //       <p>Welcome to the Lambda Hubs API</p>
 //     `);
 // });
-router.get('/api/posts', (reg, res) => {
-	res.send(`
-    <h2>Lambda Blog Posts</h>
-
-  `);
+router.get('/', (req, res) => {
+	Blog.find(req.query)
+		.then((post) => {
+			res.status(200).json(post);
+		})
+		.catch((error) => {
+			console.log(err);
+			res.status(500).json({ message: 'Error getting posts' });
+		});
 });
 
 module.exports = router;
