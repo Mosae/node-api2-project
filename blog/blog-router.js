@@ -21,5 +21,17 @@ router.get('/:id', (req, res) => {
 		}
 	});
 });
+router.post('/', (req, res) => {
+	Blog.insert(req.body)
+		.then((blog) => {
+			res.status(201).json(blog);
+		})
+		.catch((error) => {
+			console.log(error);
+			res.status(400).json({
+				errorMessage: 'Please provide title and contents for the post.',
+			});
+		});
+});
 
 module.exports = router;

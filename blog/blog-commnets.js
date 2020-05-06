@@ -3,9 +3,11 @@ const Comment = require('../data/db.js');
 const router = express.Router();
 
 router.get('/', (req, res) => {
-	Comment.findPostComments(req.query)
-		.then((comment) => {
-			res.status(200).json(comment);
+	Comment.findPostComments(postId);
+	console
+		.log(postId)
+		.then((postId) => {
+			res.status(200).json(postId);
 		})
 		.catch((err) => {
 			res.status(500).json({ message: 'Error getting comment' });
