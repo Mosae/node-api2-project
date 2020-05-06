@@ -7,7 +7,7 @@ const server = express();
 server.use(express.json());
 
 server.get('/', (req, res) => {
-	res.send(`
+	res.json(`
        <h2>Lambda Blog Post</h>
       
    `);

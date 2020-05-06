@@ -24,20 +24,6 @@ router.get('/:id', (req, res) => {
 	});
 });
 
-//add post to list
-// router.post('/', (req, res) => {
-// 	Blog.insert(req.body)
-// 		.then((blog) => {
-// 			res.status(201).json(blog);
-// 		})
-// 		.catch((error) => {
-// 			console.log(error);
-// 			res.status(400).json({
-// 				errorMessage: 'Please provide title and contents for the post.',
-// 			});
-// 		});
-// });
-
 router.post('/', (req, res) => {
 	//check to see if request had valid body title and content
 	if (!req.body.title || !req.body.contents) {
@@ -46,18 +32,65 @@ router.post('/', (req, res) => {
 		});
 		//if valid we use .insert
 	} else {
-		Blog.insert(req.body).then((blog) => {
-			res.status(201).json({ message: 'Created' });
-		});
+		Blog.insert(req.body)
+			.then((blog) => {
+				res.status(201).json({ message: 'Created' });
+			})
+			.catch((error) => {
+				console.log(error);
+				res.status(400).json({
+					errorMessage: 'Please provide title and contents for the post.',
+				});
+			});
 	}
 });
-//find comment
-router.get('/', (req, res) => {
-	Blog.findPostComments(postId).then((comment) => {
-		if (post) {
-			res.status(200).json(comment);
+//find comment for a certain post - GET
+router.get('/:id/comments', (req, res) => {
+	Blog.findById(req.params.id)
+		.then((comment) => {
+			if (comment) {
+				Blog.findPostComments(req.params.id)
+					.then((comment) => {
+						res.status(200).json(comment);
+					})
+					.catch((error) => {
+						console.log(error);
+						res.status(500).json({ message: 'Cant get comment' });
+					});
+			} else {
+				res
+					.status(404)
+					.json({ message: 'The post with the specified ID does not exist.' });
+			}
+		})
+		.catch((error) => {
+			res.status(500).json({ message: 'error getting the data' });
+		});
+});
+//post new comment
+
+router.post('/:id/comments', (req, res) => {
+	Blog.findById(req.params.id).then((post) => {
+		if (!post) {
+			res
+				.status(404)
+				.json({ message: 'The post with the specified ID does not exist.' });
+		} else if (!req.body.text) {
+			res.status(400).json({ message: 'Please provide text for the comment.' });
 		} else {
-			res.status(404).json({ message: 'Comment cannot be found' });
+			Blog.insertComment(req.body)
+				.then((comment) => {
+					Blog.findCommentById(comment.id).then((comment) => {
+						res.status(201).json(comment);
+					});
+				})
+				.catch((err) => {
+					res.status(500).json({
+						error:
+							'There was an error while saving the comment to the database.',
+					});
+					console.log(err);
+				});
 		}
 	});
 });
